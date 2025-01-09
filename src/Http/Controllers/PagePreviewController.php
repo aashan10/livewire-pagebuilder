@@ -11,7 +11,7 @@ class PagePreviewController
 {
     public function preview(string $id): View
     {
-        $page = Page::with('blocks')->findOrFail($id);
+        $page = Page::with('publishedBlocks')->findOrFail($id);
 
         return view('livewire-pagebuilder::pages.preview', ['page' => $page]);
     }

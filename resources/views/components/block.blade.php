@@ -9,14 +9,15 @@
         @php
             $fields = $this->configure();
         @endphp
-        <div class="w-full group bg-white dark:bg-neutral-800 rounded-xl shadow" x-data="{ show: false }">
-            <div class="flex justify-between items-center p-4">
+        <div class="w-full group bg-white dark:bg-neutral-800 rounded-xl shadow" x-data="{ show: true }">
+            <div class="flex justify-between items-center z-[49] relative p-4">
                 <!-- Name -->
                 <div class="flex flex-row gap-2 items-center">
                     <button x-on:click.prevent="show = !show" class="flex font-bold flex-row items-center gap-2">
                         @svg('heroicon-s-chevron-down', 'h-4 w-4 fill-neutral-900 dark:fill-white', ['x-show' => '!show'])
                         @svg('heroicon-s-chevron-up', 'h-4 w-4 fill-neutral-900 dark:fill-white', ['x-show' => 'show'])
-                        <span class="text-neutral-900 dark:text-white">{{ $this->name() }}</span>
+                        <span class="text-neutral-900 dark:text-white">{{ $this->name() }}
+                            ({{ $this->block->id }})</span>
                     </button>
                 </div>
                 <!-- Toolbar -->
@@ -26,13 +27,25 @@
                         {{ $buttons }}
                     @endif
 
-                    <x-livewire-pagebuilder::button
-                        title="{{ $this->block->published ? __('Unpublish') : __('Publish') }}"
-                        wire:click="togglePublished"
-                        class="hidden group-hover:flex items-center justify-center flex-row h-8 px-0 py-0 w-8"
-                        :icon="$this->block->published ? 'heroicon-o-eye-shash' : 'heroicon-o-eye'">
+                    <x-livewire-pagebuilder::button title="{{ __('Meta Information') }}"
+                        wire:click="$dispatch('open-modal', 'block-meta-info-modal-{{ $this->block->id }}')"
+                        class="hidden group-hover:flex items-center justify-center flex-row w-[36px] h-[36px] !px-0"
+                        icon="heroicon-o-exclamation-circle">
 
                     </x-livewire-pagebuilder::button>
+                    @if ($this->block->published)
+                        <x-livewire-pagebuilder::button title="{{ __('Unpublish') }}" wire:click="unpublish"
+                            class="hidden group-hover:flex items-center justify-center flex-row w-[36px] h-[36px] !px-0"
+                            icon="heroicon-o-eye-slash">
+
+                        </x-livewire-pagebuilder::button>
+                    @else
+                        <x-livewire-pagebuilder::button title="{{ __('Publish') }}" wire:click="publish"
+                            class="hidden group-hover:flex items-center justify-center flex-row w-[36px] h-[36px] !px-0"
+                            icon="heroicon-o-eye">
+
+                        </x-livewire-pagebuilder::button>
+                    @endif
                     @if (!$fields->isEmpty())
                         <x-modal class="rounded-xl" focusable name="edit-block-{{ $this->block->id }}">
                             <div class="flex flex-col gap-6 p-6">
@@ -48,25 +61,25 @@
 
                         <x-livewire-pagebuilder::button title="{{ __('Configurations') }}"
                             wire:click="$dispatch('open-modal', 'edit-block-{{ $this->block->id }}')"
-                            class="hidden group-hover:flex items-center justify-center flex-row h-8 px-0 py-0 w-8"
+                            class="hidden group-hover:flex items-center justify-center flex-row w-[36px] h-[36px] !px-0"
                             icon="heroicon-o-cog">
 
                         </x-livewire-pagebuilder::button>
                     @endif
 
                     <x-livewire-pagebuilder::button title="{{ __('Duplicate') }}" wire:click="duplicate"
-                        class="hidden group-hover:flex items-center justify-center flex-row h-8 px-0 py-0 w-8"
+                        class="hidden group-hover:flex items-center justify-center flex-row w-[36px] h-[36px] !px-0"
                         icon="heroicon-o-square-2-stack">
 
                     </x-livewire-pagebuilder::button>
                     <x-livewire-pagebuilder::button title="{{ __('Move up') }}" wire:click="moveUp"
-                        class="hidden group-hover:flex items-center justify-center flex-row h-8 px-0 py-0 w-8"
+                        class="hidden group-hover:flex items-center justify-center flex-row w-[36px] h-[36px] !px-0"
                         icon="heroicon-o-arrow-up">
 
                     </x-livewire-pagebuilder::button>
 
                     <x-livewire-pagebuilder::button title="{{ __('Move down') }}" wire:click="moveDown"
-                        class="hidden group-hover:flex items-center justify-center flex-row h-8 px-0 py-0 w-8"
+                        class="hidden group-hover:flex items-center justify-center flex-row w-[36px] h-[36px] !px-0"
                         icon="heroicon-o-arrow-down">
 
                     </x-livewire-pagebuilder::button>
@@ -74,11 +87,41 @@
 
                     <x-livewire-pagebuilder::button title="{{ __('Delete') }}" variant="danger" wire:click="delete"
                         x-on:click="$wire.$refresh()"
-                        class="hidden group-hover:flex items-center justify-center flex-row h-8 px-0 py-0 w-8"
+                        class="hidden group-hover:flex items-center justify-center flex-row w-[36px] h-[36px] !px-0"
                         icon="heroicon-o-trash">
 
                     </x-livewire-pagebuilder::button>
                 </div>
+                <x-livewire-pagebuilder::modal name="block-meta-info-modal-{{ $this->block->id }}">
+                    <div class="w-full p-6">
+                        <table class="table-fixed p-6 w-full text-neutral-900 dark:text-white">
+                            <thead>
+                                <tr>
+                                    <th class="text-left">{{ __('Key') }}</th>
+                                    <th class="text-left">{{ __('Value') }}</th>
+                                </tr>
+                            </thead>
+                            @php
+                                $rows = [
+                                    __('ID') => $this->block->id,
+                                    __('Created At') => $this->block->created_at,
+                                    __('Updated At') => $this->block->updated_at,
+                                    __('Published') => $this->block->published ? __('Yes') : __('No'),
+                                    __('Sort Order') => $this->block->sort_order,
+                                ];
+                            @endphp
+                            <tbody>
+                                @foreach ($rows as $key => $row)
+                                    <tr>
+                                        <td>{{ $key }}</td>
+                                        <td>{{ $row }}</td>
+                                    </tr>
+                                @endforeach
+                            </tbody>
+                        </table>
+                    </div>
+
+                </x-livewire-pagebuilder::modal>
             </div>
 
             <!-- Collapsible Body -->

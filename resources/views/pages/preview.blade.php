@@ -25,7 +25,7 @@
         <!-- Page Content -->
         <main>
 
-            @foreach ($page->blocks()->get() as $block)
+            @foreach ($page->publishedBlocks as $block)
                 <livewire:dynamic-component :is="$block->class::component()" :fields="$block->class::configure()" :block="$block"
                     :wire:key="$block->page_id . '_' . $block->id" />
             @endforeach

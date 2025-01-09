@@ -4,14 +4,17 @@ declare(strict_types=1);
 
 namespace Aashan\LivewirePageBuilder\Blocks;
 
-use Aashan\LivewirePageBuilder\Blocks\Fields\FieldCollection;
+use Aashan\LivewirePageBuilder\Concerns\MountsFields;
 use Aashan\LivewirePageBuilder\Models\Block as BlockModel;
+use Aashan\LivewirePageBuilder\UI\LayoutDefinition;
 use Illuminate\Support\Str;
 use Livewire\Attributes\On;
 use Livewire\Volt\Component;
 
 class Block extends Component implements BlockInterface
 {
+    use MountsFields;
+
     public BlockModel $block;
     public bool $editmode = false;
 
@@ -19,15 +22,7 @@ class Block extends Component implements BlockInterface
     {
         $data = json_decode($this->block->data, true);
 
-        $fields = static::configure()->toArray();
-
-        foreach ($fields as $field) {
-            if (!isset($field['name'])) {
-                continue;
-            }
-
-            $this->{$field['name']} = $data[$field['name']] ?? '';
-        }
+        $this->mountFrom($data);
     }
 
     public static function name(): string
@@ -35,10 +30,9 @@ class Block extends Component implements BlockInterface
         return collect(explode('\\', static::class))->last();
     }
 
-    public static function configure(): FieldCollection
+    public static function configure(): LayoutDefinition
     {
-        return FieldCollection::from([
-        ]);
+        return LayoutDefinition::make([]);
     }
 
     public static function component(): string
@@ -52,7 +46,7 @@ class Block extends Component implements BlockInterface
 
     protected function rules(): array
     {
-        $fields = static::configure();
+        $fields = static::fields();
 
         $rules = [];
 
@@ -67,17 +61,18 @@ class Block extends Component implements BlockInterface
     {
         $this->authorize('delete', $this->block);
         $this->block->delete();
+        session()->flash('message', __('Block deleted successfully.'));
         $this->dispatch('block-deleted');
     }
 
     #[On('page-saved')]
     public function save(): void
     {
-        /* $this->authorize('update', $this->block); */
+        $this->authorize('update', $this->block);
 
-        $fields = static::configure();
+        $fields = static::fields();
 
-        if (!$fields->isEmpty()) {
+        if (!empty($fields)) {
             $this->validate();
         }
 
@@ -90,7 +85,7 @@ class Block extends Component implements BlockInterface
         $this->block->update(['data' => json_encode($data)]);
     }
 
-    public function duplicate()
+    public function duplicate(): void
     {
         $this->authorize('create', $this->block);
 
@@ -101,17 +96,70 @@ class Block extends Component implements BlockInterface
             'sort_order' => $this->block->sort_order,
         ]);
 
-        $this->dispatch('update-post');
+        $this->dispatch('post-updated');
     }
 
-    public function togglePublished()
+    public function publish(): void
     {
         $this->authorize('update', $this->block);
 
         $this->block->update([
-            'published' => !$this->block->published ? 0 : 1,
+            'published' => 1,
         ]);
 
         $this->block = BlockModel::findOrFail($this->block->id);
+    }
+
+    public function unpublish(): void
+    {
+        $this->authorize('update', $this->block);
+
+        $this->block->update([
+            'published' => 0,
+        ]);
+
+        $this->block = BlockModel::findOrFail($this->block->id);
+    }
+
+    public function moveUp(): void
+    {
+        $this->authorize('update', $this->block);
+
+        $block = BlockModel::where('page_id', $this->block->page_id)
+            ->where('sort_order', '<', $this->block->sort_order)
+            ->orderBy('sort_order', 'desc')
+            ->first();
+
+        if ($block) {
+            $previousSortOrder = $block->sort_order;
+            $sortOrder = $block->sort_order === $this->block->sort_order ? $block->sort_order - 1 : $block->sort_order;
+
+            $this->block->update([
+                'sort_order' => $sortOrder,
+            ]);
+        }
+
+        $this->dispatch('block-updated');
+    }
+
+    public function moveDown(): void
+    {
+        $this->authorize('update', $this->block);
+
+        $block = BlockModel::where('page_id', $this->block->page_id)
+            ->where('sort_order', '>', $this->block->sort_order)
+            ->orderBy('sort_order', 'asc')
+            ->first();
+
+        if ($block) {
+            $nextSortOrder = $block->sort_order;
+            $sortOrder = $block->sort_order === $this->block->sort_order ? $block->sort_order + 1 : $block->sort_order;
+
+            $this->block->update([
+                'sort_order' => $sortOrder,
+            ]);
+        }
+
+        $this->dispatch('block-updated');
     }
 }

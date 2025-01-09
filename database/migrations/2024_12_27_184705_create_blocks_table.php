@@ -14,7 +14,7 @@ return new class extends Migration {
             $table->id();
             $table->foreignId('page_id')->constrained()->onDelete('cascade');
             $table->string('class');
-            $table->string('sort_order');
+            $table->bigInteger('sort_order');
             $table->boolean('published')->default(0);
             $table->text('data')->nullable();
             $table->timestamps();

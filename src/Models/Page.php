@@ -16,7 +16,12 @@ class Page extends Model
 
     public function blocks(): HasMany
     {
-        return $this->hasMany(Block::class);
+        return $this->hasMany(Block::class)->orderBy('sort_order');
+    }
+
+    public function publishedBlocks(): HasMany
+    {
+        return $this->blocks()->where('published', 1);
     }
 
     protected static function newFactory(): PageFactory
