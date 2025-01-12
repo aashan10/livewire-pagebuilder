@@ -38,7 +38,7 @@
     </div>
     <div class="flex flex-row gap-8 px-8">
         <div class="flex w-1/4 flex-col">
-            <div class="w-full flex flex-col rounded-xl p-6 gap-2 bg-white shadow dark:bg-neutral-800">
+            <div class="w-full flex flex-col rounded-xl p-6 gap-6 bg-white shadow dark:bg-neutral-800">
                 <x-livewire-pagebuilder::block-fields :fields="$this->configure()" />
             </div>
 

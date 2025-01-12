@@ -65,8 +65,8 @@ class EditPage extends Component
     public static function configure(): LayoutDefinition
     {
         $layout = LayoutDefinition::make()
-            ->add(Input::make('title')->label('Title')->attr('wire:model', 'title'))
-            ->add(Input::make('slug')->label('Slug')->attr('wire:model', 'slug'));
+            ->add(Input::make('title')->label('Title')->attr('wire:model', 'title')->rule('required'))
+            ->add(Input::make('slug')->label('Slug')->attr('wire:model', 'slug')->rule('required'));
 
         return $layout;
     }

@@ -48,7 +48,7 @@
                     @endif
                     @if (!$fields->isEmpty())
                         <x-modal class="rounded-xl" focusable name="edit-block-{{ $this->block->id }}">
-                            <div class="flex flex-col gap-6 p-6">
+                            <div class="flex flex-col gap-4 p-6">
                                 <div class="flex text-neutral-900 dark:text-white flex-row justify-between">
                                     <h2 class="text-xl font-bold">{{ __('Configure ') . $this->name() }}</h2>
                                     <div>

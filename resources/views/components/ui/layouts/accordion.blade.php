@@ -18,7 +18,7 @@ use Aashan\LivewirePageBuilder\UI\Layouts\Accordion;
                 @svg($ui->icon, 'w-6 h-6')
             @endif
 
-            <span class="text-lg font-semibold">{{ $ui->heading }}</span>
+            <span class="">{{ $ui->heading }}</span>
         </div>
 
         @svg('heroicon-o-chevron-right', 'w-6 h-6', ['x-show' => '!open'])
@@ -26,7 +26,7 @@ use Aashan\LivewirePageBuilder\UI\Layouts\Accordion;
     </div>
 
 
-    <div x-transition x-show="open" class="w-full flex flex-col gap-2 mt-4">
+    <div x-transition x-show="open" class="w-full flex flex-col gap-4 mt-4">
         @foreach ($ui->children as $child)
             <x-dynamic-component :component="$child->component()" :ui="$child" />
         @endforeach

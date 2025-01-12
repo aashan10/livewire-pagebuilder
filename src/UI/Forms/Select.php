@@ -4,13 +4,10 @@ declare(strict_types=1);
 
 namespace Aashan\LivewirePageBuilder\UI\Forms;
 
-use Aashan\LivewirePageBuilder\UI\Concerns\HasLabel;
 use Aashan\LivewirePageBuilder\UI\Forms\Fields\Field;
 
 class Select extends Field
 {
-    use HasLabel;
-
     public array $options = [];
 
     protected $serializable = ['label', 'icon', 'attributes', 'options'];

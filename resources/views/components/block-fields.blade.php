@@ -1,4 +1,4 @@
-<form wire:submit="save">
+<form enctype="multipart/form-data" wire:submit="save">
     <div class="space-y-6">
 
         @foreach ($fields as $field)

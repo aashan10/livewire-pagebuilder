@@ -10,10 +10,12 @@ use Aashan\LivewirePageBuilder\UI\LayoutDefinition;
 use Illuminate\Support\Str;
 use Livewire\Attributes\On;
 use Livewire\Volt\Component;
+use Livewire\WithFileUploads;
 
 class Block extends Component implements BlockInterface
 {
     use MountsFields;
+    use WithFileUploads;
 
     public BlockModel $block;
     public bool $editmode = false;
