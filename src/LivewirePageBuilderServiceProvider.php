@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 namespace Aashan\LivewirePageBuilder;
 
+use Aashan\LivewirePagebuilder\Blocks\Examples\ExampleBlock;
 use Aashan\LivewirePageBuilder\Livewire\Synthesizers\LayoutDefinitionSynthesizer;
 use Aashan\LivewirePageBuilder\Models\Block;
 use Aashan\LivewirePageBuilder\Models\Page;
-use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\ServiceProvider;
 use Livewire\Livewire;
@@ -17,7 +17,6 @@ class LivewirePageBuilderServiceProvider extends ServiceProvider
     public function boot(): void
     {
         $this->loadPublishables();
-        $this->registerViewComponents();
         $this->registerLivewireComponents();
         $this->loadRoutesFrom(__DIR__.'/../routes/web.php');
         $this->loadRoutesFrom(__DIR__.'/../routes/console.php');
@@ -27,11 +26,6 @@ class LivewirePageBuilderServiceProvider extends ServiceProvider
     public function register(): void
     {
         $this->mergeConfigFrom(__DIR__.'/../config/livewire-pagebuilder.php', 'livewire-pagebuilder');
-    }
-
-    private function registerViewComponents(): void
-    {
-        Blade::componentNamespace('Aashan\\LivewirePageBuilder\\View\\Components', 'livewire-pagebuilder');
     }
 
     private function loadPublishables(): void
@@ -60,6 +54,8 @@ class LivewirePageBuilderServiceProvider extends ServiceProvider
             'livewire-pagebuilder',
             'Aashan\\LivewirePageBuilder\\Livewire\\Components'
         );
+
+        Livewire::component(ExampleBlock::component(), ExampleBlock::class);
 
         Livewire::propertySynthesizer(LayoutDefinitionSynthesizer::class);
     }
