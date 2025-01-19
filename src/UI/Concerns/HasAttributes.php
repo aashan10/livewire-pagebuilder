@@ -8,7 +8,7 @@ use Illuminate\View\ComponentAttributeBag;
 
 trait HasAttributes
 {
-    protected array $attributes = [];
+    public array $attributes = [];
 
     public function attr(string $key, string $value): static
     {

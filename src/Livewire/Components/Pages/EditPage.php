@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Aashan\LivewirePageBuilder\Livewire\Components\Pages;
 
-use Aashan\LivewirePageBuilder\Concerns\MountsFields;
+use Aashan\LivewirePageBuilder\Blocks\Concerns\MountsFields;
 use Aashan\LivewirePageBuilder\Models\Block;
 use Aashan\LivewirePageBuilder\Models\Page;
 use Aashan\LivewirePageBuilder\UI\Forms\Input;

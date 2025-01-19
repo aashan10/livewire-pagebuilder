@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace Aashan\LivewirePageBuilder\Blocks;
 
-use Aashan\LivewirePageBuilder\Concerns\MountsFields;
 use Aashan\LivewirePageBuilder\Models\Block as BlockModel;
+use Aashan\LivewirePageBuilder\UI\Forms\Repeater;
 use Aashan\LivewirePageBuilder\UI\LayoutDefinition;
 use Illuminate\Support\Str;
 use Livewire\Attributes\On;
@@ -14,7 +14,7 @@ use Livewire\WithFileUploads;
 
 class Block extends Component implements BlockInterface
 {
-    use MountsFields;
+    use Concerns\MountsFields;
     use WithFileUploads;
 
     public BlockModel $block;
@@ -48,7 +48,7 @@ class Block extends Component implements BlockInterface
 
     protected function rules(): array
     {
-        $fields = static::fields();
+        $fields = static::getNormalFields();
 
         $rules = [];
 
@@ -74,14 +74,18 @@ class Block extends Component implements BlockInterface
 
         $fields = static::fields();
 
-        if (!empty($fields)) {
+        if (!empty($this->rules())) {
             $this->validate();
         }
 
         $data = json_decode($this->block->data, true);
 
         foreach ($fields as $field) {
-            $data[$field->name] = $this->{$field->name};
+            if ($field instanceof Repeater) {
+                $data[$field->name] = $this->repeatedFieldsData[$field->name] ?? [];
+            } else {
+                $data[$field->name] = $this->{$field->name};
+            }
         }
 
         $this->block->update(['data' => json_encode($data)]);
@@ -163,5 +167,17 @@ class Block extends Component implements BlockInterface
         }
 
         $this->dispatch('block-updated');
+    }
+
+    public function addRepeaterItem(string $field): void
+    {
+        $this->repeatedFieldsData[$field][] = static::getDefaultRepeatedFieldValue($field);
+    }
+
+    public function removeRepeaterItem(string $field, int $index): void
+    {
+        $this->repeatedFieldsData[$field] = array_filter($this->repeatedFieldsData[$field], function ($key) use ($index) {
+            return $key !== $index;
+        }, ARRAY_FILTER_USE_KEY);
     }
 }
