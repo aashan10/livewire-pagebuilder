@@ -14,7 +14,7 @@ class Block extends Model
 
     protected $fillable = ['page_id', 'data', 'class', 'sort_order', 'published'];
 
-    public function post(): BelongsTo
+    public function page(): BelongsTo
     {
         return $this->belongsTo(Page::class);
     }

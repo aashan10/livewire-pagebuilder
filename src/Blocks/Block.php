@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Aashan\LivewirePageBuilder\Blocks;
 
+use Aashan\LivewirePageBuilder\Jobs\RenderStaticPage;
 use Aashan\LivewirePageBuilder\Models\Block as BlockModel;
 use Aashan\LivewirePageBuilder\UI\Forms\Repeater;
 use Aashan\LivewirePageBuilder\UI\LayoutDefinition;
@@ -89,6 +90,8 @@ class Block extends Component implements BlockInterface
         }
 
         $this->block->update(['data' => json_encode($data)]);
+
+        dispatch(new RenderStaticPage($this->block->page()->first(), []));
     }
 
     public function duplicate(): void
