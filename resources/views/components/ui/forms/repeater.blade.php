@@ -14,16 +14,22 @@
 
 
     @foreach ($this->getRepeatedFieldData($ui->name, []) as $index => $repeaterData)
-        <div class="flex flex-col gap-4">
+        <div class="flex flex-row gap-4 relative group/repeater-item pt-6">
+
+            <div class="w-full flex flex-col">
+                @foreach ($ui->children as $field)
+                    @php
+                        $field->attr(
+                            'wire:model',
+                            'repeatedFieldsData.' . $ui->name . '.' . $index . '.' . $field->name,
+                        );
+                    @endphp
+
+                    <x-dynamic-component :component="$field->component()" :ui="$field" />
+                @endforeach
+            </div>
+
             <x-livewire-pagebuilder::ui.forms.repeater.toolbar :index="$index" :field="$ui" />
-
-            @foreach ($ui->children as $field)
-                @php
-                    $field->attr('wire:model', 'repeatedFieldsData.' . $ui->name . '.' . $index . '.' . $field->name);
-                @endphp
-
-                <x-dynamic-component :component="$field->component()" :ui="$field" />
-            @endforeach
         </div>
     @endforeach
 </div>

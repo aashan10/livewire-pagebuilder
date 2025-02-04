@@ -13,8 +13,6 @@
     </div>
 
     @if ($ui->name)
-        @error($ui->name)
-            <p class="text-sm text-red-600 dark:text-red-400">{{ $message }}</p>
-        @enderror
+        <x-livewire-pagebuilder::ui.partials.error-messages :name="$ui->name" />
     @endif
 </div>

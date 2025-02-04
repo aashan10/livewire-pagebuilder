@@ -78,8 +78,8 @@ class ExampleBlock extends Block
             ->add(
                 Repeater::make('repeated_fields')
                     ->label('Repeated Fields')
-                    ->add(Input::make('title')->label('Title')->model())
-                    ->add(Input::make('description')->label('Description')->model())
+                    ->add(Input::make('title')->label('Title')->model()->rule('required'))
+                    ->add(Input::make('description')->label('Description')->model()->rule('required'))
             );
 
         $tabs = Tabs::make()->tab('announcement', $announcement);

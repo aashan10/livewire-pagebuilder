@@ -8,8 +8,7 @@
     @endif
 
     <div class="relative">
-        <input id="{{ $ui->id() }}" type="{{ $ui->type ?? 'text' }}"
-            wire:model="{{ $ui->attributes()->get('wire:model') }}"
+        <textarea id="{{ $ui->id() }}" type="{{ $ui->type ?? 'text' }}" wire:model="{{ $ui->attributes()->get('wire:model') }}"
             {{ $ui->attributes()->merge([
                 'class' =>
                     'block w-full rounded-md border-0 py-1.5 px-3
@@ -17,13 +16,13 @@
                                                                                       text-neutral-900 dark:text-neutral-100
                                                                                       ring-1 ring-inset ' .
                     ($errors->has($ui->attributes()->get('wire:model'))
-                        ? 'error ring-red-500 dark:ring-red-500 focus:ring-red-500 dark:focus:ring-red-500'
+                        ? 'ring-red-500 dark:ring-red-500 focus:ring-red-500 dark:focus:ring-red-500'
                         : 'ring-neutral-200 dark:ring-neutral-700 focus:ring-neutral-500 dark:focus:ring-neutral-400') .
                     '
                                                                                       placeholder:text-neutral-400 dark:placeholder:text-neutral-500
                                                                                       focus:ring-2 focus:ring-inset
                                                                                       text-sm leading-6',
-            ]) }}>
+            ]) }}></textarea>
 
         @error($ui->attributes()->get('wire:model'))
             <div class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
@@ -36,7 +35,9 @@
         @enderror
     </div>
 
-    <x-livewire-pagebuilder::ui.partials.error-messages :name="$ui->attributes()->get('wire:model')" />
+    @error($ui->attributes()->get('wire:model'))
+        <p class="mt-1 text-sm text-red-500">{{ $message }}</p>
+    @enderror
 
     @if ($ui->hint && !$errors->has($ui->attributes()->get('wire:model')))
         <p class="mt-1 text-sm text-neutral-500 dark:text-neutral-400">{{ $ui->hint }}</p>

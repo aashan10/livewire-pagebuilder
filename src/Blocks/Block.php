@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Aashan\LivewirePageBuilder\Blocks;
 
+use Aashan\LivewirePageBuilder\Blocks\Concerns\HasValidation;
 use Aashan\LivewirePageBuilder\Jobs\RenderStaticPage;
 use Aashan\LivewirePageBuilder\Models\Block as BlockModel;
 use Aashan\LivewirePageBuilder\UI\Forms\Repeater;
@@ -17,6 +18,7 @@ class Block extends Component implements BlockInterface
 {
     use Concerns\MountsFields;
     use WithFileUploads;
+    use HasValidation;
 
     public BlockModel $block;
     public bool $editmode = false;
@@ -47,17 +49,37 @@ class Block extends Component implements BlockInterface
         return sprintf('%s.%s', $prefix, $file);
     }
 
-    protected function rules(): array
+    public function moveRepeaterItem(string $field, string|int $index, string $direction): void
     {
-        $fields = static::getNormalFields();
+        $repeatedFieldsData = $this->repeatedFieldsData[$field];
 
-        $rules = [];
-
-        foreach ($fields as $field) {
-            $rules[$field->name] = $field->rules;
+        if (!array_key_exists($index, $repeatedFieldsData)) {
+            return;
         }
 
-        return $rules;
+        $item = $repeatedFieldsData[$index];
+
+        if ('up' === $direction) {
+            $previousIndex = $index - 1;
+            if (!array_key_exists($previousIndex, $repeatedFieldsData)) {
+                return;
+            }
+            $previousItem = $repeatedFieldsData[$index - 1];
+
+            $repeatedFieldsData[$index - 1] = $item;
+            $repeatedFieldsData[$index] = $previousItem;
+        } else {
+            $nextIndex = $index + 1;
+            if (!array_key_exists($nextIndex, $repeatedFieldsData)) {
+                return;
+            }
+            $nextItem = $repeatedFieldsData[$index + 1];
+
+            $repeatedFieldsData[$index + 1] = $item;
+            $repeatedFieldsData[$index] = $nextItem;
+        }
+
+        $this->repeatedFieldsData[$field] = $repeatedFieldsData;
     }
 
     public function delete(): void
