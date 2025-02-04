@@ -1,6 +1,11 @@
 ## Livewire Pagebuilder 
 Livewire Pagebuilder is a Laravel/Livewire package that allows you to visually create and manage pages. Each page consists of modular blocks, where each block is an independent Livewire component capable of storing data and rendering dynamically based on its definition.
 
+## Installation
+```bash
+composer require aashan/livewire-pagebuilder
+```
+
 ### Features
 - Visual page building interface powered by livewire 
 - Modular blocks with independent logic and rendering
